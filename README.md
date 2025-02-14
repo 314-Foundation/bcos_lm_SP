@@ -7,8 +7,8 @@ This repository contains the implementation of **B-cos LM**, as introduced in th
 B-cos LM is a modification of pre-trained language models to enhance interpretability while maintaining performance. Our implementation provides:
 
 - **B-cos versions of BERT, DistilBERT, and RoBERTa**  
-- **Support for training conventional models**  
-- **Evaluation of various explanation methods**  
+- **Support for training B-cos and conventional models**  
+- **Evaluation of B-cos and various post-hoc explanation methods**  
 
 The core implementations are in:
 - `bcos_lm/models/` – Contains B-cos model architectures  
