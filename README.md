@@ -23,7 +23,7 @@ B-cos adaptations in the code are marked with `## bcos` for clarity.
 To train a B-cos LM model, run:
 
 ```bash
-bash model_finetuning.sh
+bash train_bcos_models.sh
 ```
 
 You can specify:
@@ -31,14 +31,14 @@ You can specify:
 - **Dataset**  
 - **Hyperparameters**  
 
-Modify `model_finetuning.sh` to customize these settings.
+Modify `train_bcos_models.sh` to customize these settings.
 
 ### 2. Generating Explanations
 
 To generate explanations using B-cos and other explanation methods, run:
 
 ```bash
-bash explanation_generation.sh
+bash generate_explanations.sh
 ```
 
 You can specify explanation methods to use.
@@ -48,7 +48,7 @@ You can specify explanation methods to use.
 To evaluate the model using perturbation-based methods, run:
 
 ```bash
-bash perturbation_evaluation.sh
+bash run_perturbation_evaluation.sh
 ```
 
 ### 4. Sequence Pointing Game (SeqPG) Evaluation
@@ -59,6 +59,6 @@ bash perturbation_evaluation.sh
    ```
 2. **Evaluate using SeqPG:**
    ```bash
-   bash pointing_game_evaluation.sh
+   bash run_pointing_game_evaluation.sh
    ```
 
