@@ -16,6 +16,10 @@ The core implementations are in:
 
 B-cos adaptations in the code are marked with `## bcos` for clarity.
 
+## Environment
+
+Our codes require `transformers==4.45.2`
+
 ## Getting Started
 
 ### 1. Training B-cos LM
