@@ -112,3 +112,32 @@ class BcosGELUActivation(nn.Module):
 
     def forward(self, input: Tensor) -> Tensor:
         return self.act(input)
+
+class BcosNewGELUActivation(nn.Module):
+    """
+    Implementation of the GELU activation function currently in Google BERT repo (identical to OpenAI GPT). Also see
+    the Gaussian Error Linear Units paper: https://arxiv.org/abs/1606.08415
+    """
+    def __init__(self):
+        super().__init__()
+        self.dynamic_multiplication = DynamicMultiplication()
+
+    def forward(self, input: Tensor) -> Tensor:
+        dynamic_scaling = 0.5 * (1.0 + torch.tanh(math.sqrt(2.0 / math.pi) * (input + 0.044715 * torch.pow(input, 3.0))))
+        output = self.dynamic_multiplication(weight=dynamic_scaling, input=input)
+        return output
+        # return 0.5 * input * (1.0 + torch.tanh(math.sqrt(2.0 / math.pi) * (input + 0.044715 * torch.pow(input, 3.0))))
+
+class BcosSILUActivation(nn.Module):
+    """
+    Implementation of the GELU activation function currently in Google BERT repo (identical to OpenAI GPT). Also see
+    the Gaussian Error Linear Units paper: https://arxiv.org/abs/1606.08415
+    """
+    def __init__(self):
+        super().__init__()
+        self.dynamic_multiplication = DynamicMultiplication()
+
+    def forward(self, input: Tensor) -> Tensor:
+        dynamic_scaling = torch.nn.functional.sigmoid(input)
+        output = self.dynamic_multiplication(weight=dynamic_scaling, input=input)
+        return output

@@ -783,7 +783,10 @@ class DistilBertForMaskedLM(DistilBertPreTrainedModel):
         self.distilbert = DistilBertModel(config)
         self.vocab_transform = linear(config.dim, config.dim)
         self.vocab_layer_norm = norm(config.dim, eps=1e-12)
-        self.vocab_projector = linear(config.dim, config.vocab_size)
+        if hasattr(config, "bcos_lm_head") and config.bcos_lm_head:
+            self.vocab_projector = partial(BcosLinear, b=config.b)(config.dim, config.vocab_size)
+        else:
+            self.vocab_projector = nn.Linear(config.dim, config.vocab_size)
 
         # Initialize weights and apply final processing
         self.post_init()
@@ -809,7 +812,7 @@ class DistilBertForMaskedLM(DistilBertPreTrainedModel):
         self.distilbert.resize_position_embeddings(new_num_position_embeddings)
 
     def get_output_embeddings(self) -> nn.Module:
-        if hasattr(self.config, "bcos") and self.config.bcos:
+        if hasattr(self.config, "bcos") and self.config.bcos and hasattr(self.config, "bcos_lm_head") and self.config.bcos_lm_head:
             return self.vocab_projector.linear
         return self.vocab_projector
 

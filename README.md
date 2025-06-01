@@ -6,7 +6,7 @@ This repository contains the implementation of **B-cos LM**, as introduced in th
 
 B-cos LM is a modification of pre-trained language models to enhance interpretability while maintaining performance. Our implementation provides:
 
-- **B-cos versions of BERT, DistilBERT, and RoBERTa**  
+- **B-cos versions of BERT, DistilBERT, RoBERTa, GPT-2 and Llama models**  
 - **Support for training B-cos and conventional models**  
 - **Evaluation of B-cos and various post-hoc explanation methods**  
 
@@ -66,3 +66,6 @@ bash run_perturbation_evaluation.sh
    bash run_pointing_game_evaluation.sh
    ```
 
+## Decoder-only Models
+
+Decoder-only model experiments (GPT-2 & Llama) can be run by executing `decoder_only_model_experiments.sh` in `decoder_experiments`.

@@ -1346,8 +1346,12 @@ class RobertaLMHead(nn.Module):
 
         self.dense = linear(config.hidden_size, config.hidden_size)
         self.layer_norm = norm(config.hidden_size, eps=config.layer_norm_eps)
-
-        self.decoder = linear(config.hidden_size, config.vocab_size)
+        if hasattr(config, "b") and hasattr(config, "bcos_lm_head") and config.bcos_lm_head:
+            # If bcos_lm_head is True, we use a linear layer with bias
+            self.decoder = BcosLinear(config.hidden_size, config.vocab_size, b=config.b)
+            self.bcos_lm_head = True
+        else:
+            self.decoder = nn.Linear(config.hidden_size, config.vocab_size)
         self.bias = nn.Parameter(torch.zeros(config.vocab_size))
 
         # Need a link between the two variables so that the bias is correctly resized with `resize_token_embeddings`
@@ -1366,7 +1370,7 @@ class RobertaLMHead(nn.Module):
 
     def _tie_weights(self):
         ## bcos
-        if self.bcos:
+        if self.bcos_lm_head:
             pass
         else:
             self.decoder.bias = self.bias

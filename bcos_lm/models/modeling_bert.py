@@ -702,7 +702,7 @@ class BertLMPredictionHead(nn.Module):
 
         ## bcos
         
-        if hasattr(config, "bcos") and config.bcos and hasattr(config, "b"):
+        if hasattr(config, "bcos") and config.bcos and hasattr(config, "b") and hasattr(config, "bcos_lm_head") and config.bcos_lm_head:
             linear = partial(BcosLinear, b=config.b)
             self.decoder = linear(config.hidden_size, config.vocab_size)
             self.bcos = True
