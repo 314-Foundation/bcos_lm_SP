@@ -1,9 +1,6 @@
 import torch
 import transformers
 from torch import nn
-
-# from transformers import Cache, Callable
-from transformers.modeling_utils import ALL_ATTENTION_FUNCTIONS
 from transformers.models.llama.modeling_llama import (
     LlamaAttention,
     LlamaConfig,
@@ -185,6 +182,7 @@ if transformers.__version__ == "4.45.2":
             return attn_output, attn_weights, past_key_value
 
 else:
+    print("You are using a version of transformers that is not 4.45.2!")
 
     def eager_attention_forward(
         module: nn.Module,
