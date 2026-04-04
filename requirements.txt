@@ -7,3 +7,4 @@ timm
 seaborn
 transformers
 # transformers==4.45.2
+ipywidgets
