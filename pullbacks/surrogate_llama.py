@@ -1,6 +1,7 @@
 import torch
 from torch import nn
-from transformers import Cache, Callable
+
+# from transformers import Cache, Callable
 from transformers.modeling_utils import ALL_ATTENTION_FUNCTIONS
 from transformers.models.llama.modeling_llama import (
     LlamaAttention,
@@ -83,7 +84,7 @@ class SurrogateLlamaAttention(SurrogateModule, LlamaAttention):
         hidden_states: torch.Tensor,
         position_embeddings: tuple[torch.Tensor, torch.Tensor] | None = None,
         attention_mask: torch.Tensor | None = None,
-        past_key_values: Cache | None = None,
+        past_key_values=None,
         **kwargs: Unpack[TransformersKwargs],
     ) -> tuple[torch.Tensor, torch.Tensor]:
         input_shape = hidden_states.shape[:-1]
