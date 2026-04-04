@@ -949,7 +949,7 @@ class GradientNPropabationExplainer(BaseExplainer):
                 "steps": 5,
                 "eps": None,
                 # "eps": 100,
-                "normalize_step": False,
+                "normalize_step": True,
                 "relative_alpha": False,
                 "clip_margin": None,
                 # "clip_margin": 0.0,

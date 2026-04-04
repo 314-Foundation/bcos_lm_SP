@@ -10,7 +10,11 @@ from torch import Tensor, nn
 from torchvision.models.convnext import LayerNorm2d
 
 # from transformers.activations import ACT2FN, SiLUActivation
-from transformers.models.llama.modeling_llama import LlamaAttention, LlamaRMSNorm
+from transformers.models.llama.modeling_llama import (
+    LlamaAttention,
+    LlamaRMSNorm,
+    LlamaSdpaAttention,
+)
 
 from .surrogate_llama import SurrogateLlamaAttention, SurrogateLlamaRMSNorm
 from .surrogate_module import SurrogateModule
@@ -274,7 +278,7 @@ class SurrogatePVTAttention(SurrogateModule, PVTAttention):
 
 SURROGATE_CLASS_MAP = {
     nn.ReLU: (SurrogateReLU, 0.6),
-    nn.SiLU: (SurrogateSiLU, 1.6),
+    nn.SiLU: (SurrogateSiLU, 1.0),
     nn.GELU: (SurrogateGELU, 1.0),
     nn.MaxPool2d: (SurrogateMaxPool2d, 0.3),
     LayerNorm2d: (SurrogateLayerNorm2d, None),
@@ -283,7 +287,8 @@ SURROGATE_CLASS_MAP = {
     nn.MultiheadAttention: (SurrogateMultiheadAttention, 1.0),
     # SiLUActivation: (SurrogateSiLU, 1.0),
     LlamaRMSNorm: (SurrogateLlamaRMSNorm, None),
-    LlamaAttention: (SurrogateLlamaAttention, 1.0),
+    # LlamaAttention: (SurrogateLlamaAttention, 1.0),
+    LlamaSdpaAttention: (SurrogateLlamaAttention, 1.0),
 }
 SURROGATE_BASE_CLASSES = tuple(SURROGATE_CLASS_MAP.keys())
 
