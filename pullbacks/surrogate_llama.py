@@ -182,6 +182,9 @@ if transformers.__version__ == "4.45.2":
 
 else:
     print("You are using a version of transformers that is not 4.45.2!")
+    raise NotImplementedError(
+        "SurrogateLlamaAttention is only implemented for transformers v4.45.2"
+    )
 
     # def eager_attention_forward(
     #     module: nn.Module,
