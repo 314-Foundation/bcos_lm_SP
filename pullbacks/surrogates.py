@@ -8,6 +8,11 @@ import torch.nn.functional as F
 from timm.models.pvt_v2 import Attention as PVTAttention
 from torch import Tensor, nn
 from torchvision.models.convnext import LayerNorm2d
+from transformers.activations import ACT2FN, SiLUActivation
+from transformers.models.llama.modeling_llama import LlamaAttention, LlamaRMSNorm
+
+from .surrogate_llama import SurrogateLlamaAttention, SurrogateLlamaRMSNorm
+from .surrogate_module import SurrogateModule
 
 
 def normal_cdf(x, temp=1.0):
@@ -27,27 +32,6 @@ def softmax_detach_norm_stable(x, dim=-1, detach=True):
         denom = denom.detach()
 
     return ex / denom
-
-
-class SurrogateModule(nn.Module):
-    def __init__(self, *args, temperature=1.0, standard_backward=False, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.temperature = temperature
-        self.standard_backward = standard_backward
-
-    def extra_repr(self):
-        ret = super().extra_repr()
-        if ret:
-            ret += ", "
-        return f"{ret}standard_backward={self.standard_backward}, temperature={self.temperature}"
-
-    @classmethod
-    def replace_class_with_surrogate(
-        cls, module, temperature=1.0, standard_backward=False
-    ):
-        module.__class__ = cls
-        module.temperature = temperature
-        module.standard_backward = standard_backward
 
 
 class FGIModule(SurrogateModule):
@@ -294,6 +278,9 @@ SURROGATE_CLASS_MAP = {
     nn.LayerNorm: (SurrogateLayerNorm, None),
     PVTAttention: (SurrogatePVTAttention, 1.0),
     nn.MultiheadAttention: (SurrogateMultiheadAttention, 1.0),
+    SiLUActivation: (SurrogateSiLU, 1.0),
+    LlamaRMSNorm: (SurrogateLlamaRMSNorm, None),
+    LlamaAttention: (SurrogateLlamaAttention, 1.0),
 }
 SURROGATE_BASE_CLASSES = tuple(SURROGATE_CLASS_MAP.keys())
 

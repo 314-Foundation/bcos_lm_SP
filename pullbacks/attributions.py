@@ -1,8 +1,9 @@
 import numpy as np
 import torch
-from lib.helpers import squeeze_channels
-from lib.pga import PGA
-from lib.surrogates import set_module_standard_backward_, soften_module_inplace_
+
+from .helpers import squeeze_channels
+from .pga import PGA
+from .surrogates import set_module_standard_backward_, soften_module_inplace_
 
 
 class GradientAscentDiff:
