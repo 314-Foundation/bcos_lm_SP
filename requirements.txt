@@ -5,8 +5,8 @@ torchattacks
 matplotlib
 timm
 seaborn
-transformers
-# transformers==4.45.2
+# transformers
+transformers==4.45.2
 ipywidgets
 captum
 datasets
