@@ -28,9 +28,10 @@ class SurrogateLlamaRMSNorm(SurrogateModule):
 
         mult = torch.rsqrt(variance + self.variance_epsilon) * self.weight
         mult = mult.to(input_dtype)
-        mult = (
-            mult.detach()
-        )  # detach the multiplier to prevent gradients from flowing through it
+        if not self.standard_backward:
+            mult = (
+                mult.detach()
+            )  # detach the multiplier to prevent gradients from flowing through it
 
         return hidden_states.to(input_dtype) * mult
 

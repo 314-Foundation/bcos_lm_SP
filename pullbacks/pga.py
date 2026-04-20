@@ -60,7 +60,24 @@ class PGA(Attack):
                 max=self.clip_max + self.clip_margin,
             ).detach()
 
-    def forward(self, images, labels):
+    def get_logits(
+        self, inputs, labels=None, additional_forward_args=None, *args, **kwargs
+    ):
+        if self._normalization_applied is False:
+            inputs = self.normalize(inputs)
+        logits = self.model(
+            inputs,
+            attention_mask=(
+                additional_forward_args[0]
+                if additional_forward_args is not None
+                else None
+            ),  # TODO - hack, need to make this more general for non-transformer models
+            # inputs,
+            # *additional_forward_args
+        )
+        return logits
+
+    def forward(self, images, labels, additional_forward_args=None):
         r"""
         Overridden.
         """
@@ -76,7 +93,9 @@ class PGA(Attack):
         for _ in range(self.steps):
             adv_images.requires_grad = True
             # self.model.zero_grad() # not needed since we use torch.autograd.grad
-            outputs = self.get_logits(adv_images)
+            outputs = self.get_logits(
+                adv_images, additional_forward_args=additional_forward_args
+            )
 
             # Calculate loss
             if self.targeted:
