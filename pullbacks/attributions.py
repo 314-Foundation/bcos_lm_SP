@@ -22,6 +22,10 @@ class GradientAscentDiff:
         self.squeeze_channel_mode = squeeze_channel_mode
 
     def attribute(self, inputs, target, additional_forward_args=None):
+        is_inputs_tuple = isinstance(inputs, tuple)
+        if is_inputs_tuple:
+            inputs = inputs[0]
+
         if isinstance(inputs, np.ndarray):
             device = next(self.model.parameters()).device
             inputs = torch.as_tensor(inputs, device=device)
@@ -43,6 +47,9 @@ class GradientAscentDiff:
                 attributions,
                 mode=self.squeeze_channel_mode,
             )
+
+        if is_inputs_tuple:
+            attributions = (attributions,)
 
         return attributions
 
