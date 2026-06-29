@@ -9,10 +9,13 @@ from datasets import load_dataset
 from torch.utils.data import DataLoader, Subset
 from tqdm import tqdm
 from transformers import AutoConfig, AutoTokenizer
+from transformers import BertTokenizer
 
 from bcos_lm.models.modeling_bert import BertForSequenceClassification
 from bcos_lm.models.modeling_distilbert import DistilBertForSequenceClassification
 from bcos_lm.models.modeling_roberta import RobertaForSequenceClassification
+from bcos_lm.models.modeling_llama import LlamaForSequenceClassification
+
 from pullbacks.surrogates import soften_module_inplace_
 from saliency_utils.Explainer import (
     AttentionExplainer,
@@ -24,6 +27,8 @@ from saliency_utils.Explainer import (
 )
 from saliency_utils.utils import set_random_seed, split_dataset
 
+CHECKPOINT = "/net/tscratch/people/plgpietron/best_model_state__.bin"
+
 EXPLANATION_METHODS = {
     "Bcos": BcosExplainer,
     "Attention": AttentionExplainer,
@@ -32,13 +37,13 @@ EXPLANATION_METHODS = {
     "GuidedBackprop": GradientNPropabationExplainer,
     "InputXGradient": GradientNPropabationExplainer,
     "IntegratedGradients": GradientNPropabationExplainer,
-    "SIG": GradientNPropabationExplainer,
+    #"SIG": GradientNPropabationExplainer,
     "Occlusion": OcclusionExplainer,
     "ShapleyValue": ShapleyValueExplainer,
     "KernelShap": ShapleyValueExplainer,
     "Lime": LimeExplainer,
     "Pullback": GradientNPropabationExplainer,
-    "PullbackAscent": GradientNPropabationExplainer,
+    #"PullbackAscent": GradientNPropabationExplainer,
 }
 
 
@@ -56,31 +61,43 @@ def main(args):
     set_random_seed(args.seed)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     # Load pre-trained BERT model and tokenizer
+    if "llama" in args.model_dir.lower():
+        Model = LlamaForSequenceClassification
     if "distilbert" in args.model_dir.lower():
         Model = DistilBertForSequenceClassification
     elif "roberta" in args.model_dir.lower():
         Model = RobertaForSequenceClassification
     elif "bert" in args.model_dir.lower():
         Model = BertForSequenceClassification
+
     config = AutoConfig.from_pretrained(args.model_dir, num_labels=args.num_labels)
-    # config.bcos = args.bcos
-    # config.b = args.b
+    #config.bcos = args.bcos
+    #config.b = args.b
 
     config.output_attentions = True
     config.num_labels = args.num_labels
     # print(config)
-    model = Model.load_from_pretrained(
-        args.model_dir, config=config, output_attentions=True
-    )
-    soften_module_inplace_(model)  # Pullbacks
+    
+    model = BertForSequenceClassification.from_pretrained(args.model_dir)
+    sd = torch.load(CHECKPOINT)
+    model.load_state_dict(sd)
+
+    #model = Model.load_from_pretrained(
+    #    args.model_dir, config=config, output_attentions=True
+    #)
+
+    #soften_module_inplace_(model)  # Pullbacks
     model.eval()
     model.to(device)
 
-    tokenizer = AutoTokenizer.from_pretrained(args.model_dir)
+    tokenizer = BertTokenizer.from_pretrained('bert-base-uncased', 
+                                          do_lower_case=True)
+    #tokenizer = AutoTokenizer.from_pretrained(args.model_dir)
 
     # Load a dataset from HuggingFace datasets library
     dataset = load_dataset(args.dataset_name)
     test_dataset = dataset[args.split]
+
     if "val" in dataset or args.split_ratio is None:
         test_dataset = Subset(test_dataset, range(len(test_dataset)))
     else:
@@ -163,13 +180,13 @@ if __name__ == "__main__":
     parser.add_argument(
         "--model_dir",
         type=str,
-        default="models/bert_base_imdb_512",
+        default="/net/tscratch/people/plgpietron/llama/llama-7b-h_f",
         help="Name of the pre-trained model",
     )
     parser.add_argument(
         "--num_labels",
         type=int,
-        default=2,
+        default=5,
         help="Number of labels in the classification",
     )
     parser.add_argument(
@@ -202,7 +219,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--output_dir",
         type=str,
-        default="baseline_saliency_results/all_methods_1000_examples_512",
+        default="/net/tscratch/people/plgpietron/llama/all_methods_1000",
         help="Directory to save the output files",
     )
     parser.add_argument(

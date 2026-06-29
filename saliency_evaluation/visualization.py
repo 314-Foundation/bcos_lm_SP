@@ -67,12 +67,15 @@ def print_importance(html, importances, tokenized_texts, idx, true_label, predic
 
 def print_importance_dataset(explanation_path, method, save_path, no_cls_sep=False, num_examples=-1):
     with open(explanation_path, 'r') as f:
-        explanations = json.load(f)[method]
+
+        #import pdb
+        #pdb.set_trace()
+        explanations = json.load(f)['Pullback_mean'] #[method]
     
     if num_examples > 0:
         explanations = explanations[:num_examples]
     html = None
-    for example in tqdm(explanations):
+    for example in tqdm(explanations[:100]):
         true_label = example[0]["true_label"]
         predicted_class = example[0]["predicted_class"]
         idx = example[0]["index"]
