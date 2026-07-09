@@ -37,13 +37,13 @@ EXPLANATION_METHODS = {
     "GuidedBackprop": GradientNPropabationExplainer,
     "InputXGradient": GradientNPropabationExplainer,
     "IntegratedGradients": GradientNPropabationExplainer,
-    #"SIG": GradientNPropabationExplainer,
+    "SIG": GradientNPropabationExplainer,
     "Occlusion": OcclusionExplainer,
     "ShapleyValue": ShapleyValueExplainer,
     "KernelShap": ShapleyValueExplainer,
     "Lime": LimeExplainer,
     "Pullback": GradientNPropabationExplainer,
-    #"PullbackAscent": GradientNPropabationExplainer,
+    "PullbackAscent": GradientNPropabationExplainer,
 }
 
 
@@ -71,28 +71,27 @@ def main(args):
         Model = BertForSequenceClassification
 
     config = AutoConfig.from_pretrained(args.model_dir, num_labels=args.num_labels)
-    #config.bcos = args.bcos
-    #config.b = args.b
+    # config.bcos = args.bcos
+    # config.b = args.b
 
     config.output_attentions = True
     config.num_labels = args.num_labels
     # print(config)
-    
+
     model = BertForSequenceClassification.from_pretrained(args.model_dir)
     sd = torch.load(CHECKPOINT)
     model.load_state_dict(sd)
 
-    #model = Model.load_from_pretrained(
-    #    args.model_dir, config=config, output_attentions=True
-    #)
+    model = Model.load_from_pretrained(
+        args.model_dir, config=config, output_attentions=True
+    )
 
-    #soften_module_inplace_(model)  # Pullbacks
+    soften_module_inplace_(model)  # Pullbacks
     model.eval()
     model.to(device)
 
-    tokenizer = BertTokenizer.from_pretrained('bert-base-uncased', 
-                                          do_lower_case=True)
-    #tokenizer = AutoTokenizer.from_pretrained(args.model_dir)
+    # tokenizer = BertTokenizer.from_pretrained("bert-base-uncased", do_lower_case=True)
+    tokenizer = AutoTokenizer.from_pretrained(args.model_dir)
 
     # Load a dataset from HuggingFace datasets library
     dataset = load_dataset(args.dataset_name)

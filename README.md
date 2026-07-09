@@ -1,6 +1,42 @@
-# B-cos LM
+# SP in LLM
 
-This repository contains the implementation of **B-cos LM**, as introduced in the paper **"B-cos LM: Efficiently Transforming Pre-trained Language Models for Improved Explainability"**.
+
+## Formatowanie i linting kodu Python w VS Code
+
+W projekcie używamy **VS Code** z formatowaniem kodu Python przez **Black** oraz porządkowaniem importów przez **isort**. Dzięki temu kod jest automatycznie formatowany przy zapisie pliku, a importy są układane zgodnie z profilem kompatybilnym z Black.
+
+Poniższą konfigurację należy wkleić do pliku ustawień VS Code:
+
+```text
+.vscode/settings.json
+```
+
+Jeśli plik lub katalog `.vscode` jeszcze nie istnieje, należy je utworzyć w głównym katalogu projektu.
+
+```json
+{
+  "python.linting.pylintUseMinimalCheckers": false,
+  "python.linting.banditPath": "",
+  "python.linting.pylintEnabled": false,
+  "[python]": {
+    "editor.defaultFormatter": "ms-python.black-formatter",
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": "explicit"
+    },
+    "editor.formatOnType": true
+  },
+  "isort.args": [
+    "--profile",
+    "black"
+  ]
+}
+```
+
+Po zapisaniu ustawień VS Code będzie automatycznie formatować pliki `.py` przy zapisie oraz uruchamiać organizowanie importów zgodnie z konfiguracją isort.
+
+
+# README from B-cos LM
 
 ## Overview
 

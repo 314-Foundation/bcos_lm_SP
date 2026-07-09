@@ -45,7 +45,6 @@ class PGA(Attack):
         self.self_explain = self_explain
 
     def compute_loss(self, outputs, target):
-
         if self.self_explain:
             return 0.5 * (outputs**2).sum()
         if self.use_cross_entropy_loss:
@@ -66,7 +65,7 @@ class PGA(Attack):
     ):
         if self._normalization_applied is False:
             inputs = self.normalize(inputs)
- 
+
         logits = self.model(
             inputs,
             attention_mask=(
@@ -87,8 +86,7 @@ class PGA(Attack):
 
         images = images.clone().detach().to(self.device)
         labels = labels.clone().detach().to(self.device)
-
-        self.targeted = False
+        batch_view = (-1,) + (1,) * (images.ndim - 1)
 
         if self.targeted:
             target_labels = self.get_target_label(images, labels)
@@ -120,18 +118,17 @@ class PGA(Attack):
                 if self.normalize_step:
                     grad_norms = (
                         torch.norm(grad.flatten(1), p=self.pnorm, dim=1)
-                        .clamp_min(self.eps_for_division).view(-1, 1, 1)
-                         
+                        .clamp_min(self.eps_for_division)
+                        .view(batch_view)
                     )
-                    #.view(-1, 1, 1, 1)
                     grad = grad / grad_norms
 
                 if self.relative_alpha:
                     adv_images_norms = (
                         torch.norm(adv_images.flatten(1), p=self.pnorm, dim=1)
-                        .clamp_min(self.eps_for_division).view(-1, 1, 1) 
+                        .clamp_min(self.eps_for_division)
+                        .view(batch_view)
                     )
-                    #.view(-1, 1, 1, 1)
                     grad = grad * adv_images_norms
 
                 grad = grad * self.alpha
@@ -145,7 +142,7 @@ class PGA(Attack):
                 ).clamp_min(self.eps_for_division)
                 factor = self.eps / delta_norms
                 factor = torch.min(factor, torch.ones_like(delta_norms))
-                delta = delta * factor.view(-1, 1, 1) #factor.view(-1, 1, 1, 1)
+                delta = delta * factor.view(batch_view)
 
                 adv_images = images + delta
 
